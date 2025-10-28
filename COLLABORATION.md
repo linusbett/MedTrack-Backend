@@ -2,7 +2,7 @@ Collaboration guidelines.
 Clone And Setup up The Repo
 Clone this repo by running this command:
 
-git clone https://github.com/linusbett/MedTarack-Backend.git
+git clone https://github.com/linusbett/MedTrack-Backend.git
 Make sure you already have npm and git installed on your device.
 
 Then install required dependencies by running this command on your terminal:
