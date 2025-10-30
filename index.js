@@ -7,6 +7,13 @@ const mongoose = require('mongoose');
 const authRouter = require('./src/routers/authRouter');
 const postsRouter = require('./src/routers/postsRouter');
 
+const app = express();
+app.use(cors());
+app.use(helmet());
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 mongoose
     .connect(process.env.MONGO_URI)
     .then(() => {
@@ -15,16 +22,6 @@ mongoose
     .catch((err) => {
         console.log(err);
     });
-
-const app = express();
-
-app.use(express.json());
-app.use(cors());
-app.use(helmet());
-app.use(cookieParser());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
 app.use('/api/auth', authRouter);
 app.use('/api/posts', postsRouter);
 app.get('/', (req, res) => {
