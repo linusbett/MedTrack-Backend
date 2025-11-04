@@ -4,3 +4,7 @@ node_modules/
 npm-debug.log
 node_modules/
 .env
+# Ignore Firebase / Google Cloud keys
+*.json
+!package.json
+!tsconfig.json
