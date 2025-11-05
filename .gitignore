@@ -2,3 +2,10 @@ node_modules/
 .env
 .DS_Store
 npm-debug.log
+node_modules/
+.env
+# Ignore Firebase / Google Cloud keys
+*.json
+!package.json
+!tsconfig.json
+src/medtrack-b1234-firebase-adminsdk-fbsvc-a3ee35abf0.json
