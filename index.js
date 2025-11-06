@@ -9,23 +9,19 @@ dotenv.config(); // ✅ load .env immediately
 
 const authRouter = require('./src/routers/authRouter');
 const postsRouter = require('./src/routers/postsRouter');
+const reminderRouter = require('./src/routers/reminderRouter');
+
 
 mongoose
     .connect(process.env.MONGO_URI)
-    .then(() => {
-        console.log('Database connected');
-    })
-    .catch((err) => {
-        console.log(err);
-    });
+    .then(() => console.log('✅ Database connected'))
+    .catch(err => console.error('❌ Database connection error:', err.message));
 
 const app = express();
-
 app.use(express.json());
 app.use(cors());
 app.use(helmet());
 app.use(cookieParser());
-app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRouter);
