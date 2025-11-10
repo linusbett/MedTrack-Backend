@@ -3,7 +3,6 @@ const Medication = require('../models/Medication');
 
 // ✅ Extracts the user ID safely from the JWT payload
 const getUserIdFromToken = (req) => {
-  // Our token contains userId (not _id)
   return req?.user?.userId || req?.user?.id || req?.user?._id;
 };
 
@@ -19,7 +18,6 @@ exports.addMedication = async (req, res) => {
 
     const { name, dosage, schedule } = req.body;
 
-    // Validate request body
     if (!name || !dosage || !Array.isArray(schedule) || schedule.length === 0) {
       return res.status(400).json({
         success: false,
@@ -27,7 +25,6 @@ exports.addMedication = async (req, res) => {
       });
     }
 
-    // Create reminders with default "Pending" status
     const reminders = schedule.map((t) => ({
       time: t,
       status: 'Pending',
@@ -125,5 +122,38 @@ exports.updateReminderStatus = async (req, res) => {
   } catch (error) {
     console.error('updateReminderStatus error:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+// ------------------------------------------------------------
+// DELETE /api/reminder/delete/:id
+// ------------------------------------------------------------
+exports.deleteMedication = async (req, res) => {
+  try {
+    const userId = getUserIdFromToken(req);
+    const { id } = req.params;
+
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+
+    const deletedMed = await Medication.findOneAndDelete({ _id: id, userId });
+
+    if (!deletedMed) {
+      return res.status(404).json({
+        success: false,
+        message: 'Medication not found',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Medication deleted successfully',
+    });
+  } catch (error) {
+    console.error('deleteMedication error:', error);
+    return res
+      .status(500)
+      .json({ success: false, message: 'Server error while deleting medication' });
   }
 };
