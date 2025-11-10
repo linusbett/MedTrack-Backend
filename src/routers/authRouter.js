@@ -1,8 +1,6 @@
 const express = require('express');
 const authController = require('../controllers/authController');
 const { identifier } = require('../middlewares/identification');
-const User = require('../models/usersModel');
-
 const router = express.Router();
 
 // 🧩 Auth routes
