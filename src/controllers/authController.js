@@ -396,3 +396,39 @@ exports.updateFcmToken = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
+// ======================================
+// GET PROFILE (NEW)
+// ======================================
+exports.getProfile = async (req, res) => {
+  try {
+    const user = req.user;
+
+    if (!user || !user.userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized: Invalid token',
+      });
+    }
+
+    const foundUser = await User.findById(user.userId).select('-password');
+
+    if (!foundUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      user: foundUser,
+    });
+  } catch (error) {
+    console.error('getProfile error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error while fetching profile',
+    });
+  }
+};

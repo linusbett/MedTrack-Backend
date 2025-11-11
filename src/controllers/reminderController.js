@@ -163,3 +163,64 @@ exports.deleteMedication = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error while deleting medication' });
   }
 };
+
+// ------------------------------------------------------------
+// GET /api/reminder/today
+// Fetch reminders scheduled for today
+// ------------------------------------------------------------
+exports.getTodayReminders = async (req, res) => {
+  try {
+    const userId = getUserIdFromToken(req);
+    if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized' });
+
+    const today = new Date().toISOString().split('T')[0];
+    const meds = await Medication.find(
+      { userId, 'reminders.date': today },
+      { name: 1, dosage: 1, reminders: { $elemMatch: { date: today } } }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Today reminders fetched successfully',
+      data: meds,
+    });
+  } catch (error) {
+    console.error('❌ getTodayReminders error:', error);
+    res.status(500).json({ success: false, message: 'Server error while fetching today reminders' });
+  }
+};
+
+// ------------------------------------------------------------
+// GET /api/reminder/history
+// Fetch reminders marked Taken or Skipped within last 7 days
+// ------------------------------------------------------------
+exports.getReminderHistory = async (req, res) => {
+  try {
+    const userId = getUserIdFromToken(req);
+    if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized' });
+
+    const now = new Date();
+    const past7Days = new Date();
+    past7Days.setDate(now.getDate() - 7);
+    const fromDate = past7Days.toISOString().split('T')[0];
+    const toDate = now.toISOString().split('T')[0];
+
+    const meds = await Medication.find(
+      {
+        userId,
+        'reminders.date': { $gte: fromDate, $lte: toDate },
+        'reminders.status': { $in: ['Taken', 'Skipped'] },
+      },
+      { name: 1, dosage: 1, reminders: 1 }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Reminder history fetched successfully',
+      data: meds,
+    });
+  } catch (error) {
+    console.error('❌ getReminderHistory error:', error);
+    res.status(500).json({ success: false, message: 'Server error while fetching reminder history' });
+  }
+};
